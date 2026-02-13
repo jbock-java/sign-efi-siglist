@@ -30,10 +30,11 @@ sudo apt-get install gnu-efi
 sudo dnf install gnu-efi-devel
 ```
 
-### Installation
+### Build
 
 ```sh
-sudo make install
+make cert-to-efi-sig-list
+make sign-efi-siglist
 ```
 
 ### Create and enroll your keys
@@ -55,31 +56,35 @@ Choose a guid and convert all your `crt` files to "efi-siglist" format:
 
 ```sh
 guid=4212023e-a290-11f0-bd3b-e446b04ad651
-for name in PK KEK myOrg fedora; do
-    cert-to-efi-sig-list -g $guid $name.crt $name.esl
-done
+./cert-to-efi-sig-list -g $guid PK.crt PK.esl
+./cert-to-efi-sig-list -g $guid KEK.crt KEK.esl
+./cert-to-efi-sig-list -g $guid db_myOrg.crt db_myOrg.esl
 ```
 
-The `esl` files can be concatenated. Combine `myOrg.esl` and `fedora.esl` to create `db.esl`:
+You can find the microsoft keys here: <https://github.com/Foxboron/sbctl>
+
+The `esl` files can be concatenated. Combine `myOrg.esl`, `fedora.esl` and microsoft keys to create `db.esl`:
 
 ```sh
-cat myOrg.esl fedora.esl > db.esl
+cat db_myOrg.esl [...more keys, e.g. microsoft...] fedora.esl ../ > db.esl
 ```
 
-Now sign your `esl` files, thus creating three files `PK.vardata`, `KEK.vardata` and `db.vardata`:
+Now sign the three `esl` files. This creates three files `PK.vardata`, `KEK.vardata` and `db.vardata`:
 
 ```sh
 timestamp="2025-10-06 12:00:01"
 # PK signs PK
-sign-efi-siglist -g $guid -t "$timestamp" -k PK.key -c PK.crt PK PK.esl PK.vardata
+./sign-efi-siglist -g $guid -t "$timestamp" -k PK.key -c PK.crt PK PK.esl PK.vardata
 # PK signs KEK
-sign-efi-siglist -g $guid -t "$timestamp" -k PK.key -c PK.crt KEK KEK.esl KEK.vardata
+./sign-efi-siglist -g $guid -t "$timestamp" -k PK.key -c PK.crt KEK KEK.esl KEK.vardata
 # KEK signs db
-sign-efi-siglist -g $guid -t "$timestamp" -k KEK.key -c KEK.crt db db.esl db.vardata
+./sign-efi-siglist -g $guid -t "$timestamp" -k KEK.key -c KEK.crt db db.esl db.vardata
 ```
 
-The `vardata` files do not contain private key data, so they can be shared.
-Boot the target system in "Secure Boot Setup Mode" and enroll your keys:
+The three `vardata` files do not contain private key data. They are not a secret.
+
+You can now boot the target system in "Secure Boot Setup Mode" and enroll your keys,
+by simply copying each to the appropriate place in the efivarfs:
 
 ```sh
 chattr -i /sys/firmware/efi/efivars/*
