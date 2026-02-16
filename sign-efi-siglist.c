@@ -16,11 +16,6 @@
 
 #define MAX_VAR_LEN 8
 
-static const uint32_t attributes = EFI_VARIABLE_NON_VOLATILE
-	| EFI_VARIABLE_RUNTIME_ACCESS
-	| EFI_VARIABLE_BOOTSERVICE_ACCESS
-	| EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
-
 void usage()
 {
 	printf("Usage: sign-efi-siglist [-g <guid>] [-t <timestamp>] [-c <crt_file>] [-k <key_file>] <var> <x.esl> <x.vardata>\n");
@@ -42,6 +37,7 @@ void help()
 	       "to the efivarfs filesystem.\n"
 	       "There is no need for an additional tool like \"efi-updatevar\".\n\n"
 	       "Options:\n"
+	       "\t-a               Prepare the variable for APPEND_WRITE rather than replacement\n"
 	       "\t-t <timestamp>   Use <timestamp> as the timestamp of the timed variable update\n"
 	       "\t                 If not present, then the timestamp will be taken from system\n"
 	       "\t                 time.  Note you must use this option when doing detached\n"
@@ -61,6 +57,11 @@ int main(int argc, char *argv[])
 	int varlen, sigsize;
 	EFI_GUID owner;
 	struct stat st;
+
+	uint32_t attributes = EFI_VARIABLE_NON_VOLATILE
+		| EFI_VARIABLE_RUNTIME_ACCESS
+		| EFI_VARIABLE_BOOTSERVICE_ACCESS
+		| EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
 	EFI_TIME timestamp;
 	memset(&timestamp, 0, sizeof(timestamp));
 
@@ -87,6 +88,10 @@ int main(int argc, char *argv[])
 			certfile = argv[2];
 			argv += 2;
 			argc -= 2;
+		} else if (strcmp("-a", argv[1]) == 0) {
+			attributes |= EFI_VARIABLE_APPEND_WRITE;
+			argv += 1;
+			argc -= 1;
 		} else  {
 			break;
 		}

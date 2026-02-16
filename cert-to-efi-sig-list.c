@@ -11,14 +11,14 @@
 #include <guid.h>
 #include <efiauthenticated.h>
 
-static void usage(const char *progname)
+static void usage()
 {
-	printf("Usage: %s [-g <guid>] <crt file> <efi sig list file>\n", progname);
+	printf("Usage: cert-to-efi-sig-list [-g <guid>] <crt file> <efi sig list file>\n", progname);
 }
 
-static void help(const char * progname)
+static void help()
 {
-	usage(progname);
+	usage();
 	printf("Take an input X509 certificate (in PEM format) and convert it to an EFI\n"
 	       "signature list file containing only that single certificate\n\n"
 	       "Options:\n"
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 
 	while (argc > 1) {
 		if (strcmp("--help", argv[1]) == 0) {
-			help(progname);
+			help();
 			exit(0);
 		} else if (strcmp("-g", argv[1]) == 0) {
 			if (str_to_guid(argv[2], &owner)) {
@@ -54,6 +54,7 @@ int main(int argc, char *argv[])
 	  
 
 	if (argc != 3) {
+		usage();
 		exit(1);
 	}
 

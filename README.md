@@ -81,6 +81,12 @@ timestamp="2025-10-06 12:00:01"
 ./sign-efi-siglist -g $guid -t "$timestamp" -k KEK.key -c KEK.crt db db.esl db.vardata
 ```
 
+Or, sign an `esl` file for appending:
+
+```
+./sign-efi-siglist -a -g $guid -t "$timestamp" -k KEK.key -c KEK.crt db windows_uefi_ca_2023.esl windows_uefi_ca_2023.vardata
+```
+
 The three `vardata` files do not contain private key data. They are not a secret.
 
 You can now boot the target system in "Secure Boot Setup Mode" and enroll your keys,
