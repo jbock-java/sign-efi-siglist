@@ -13,7 +13,7 @@
 
 static void usage()
 {
-	printf("Usage: cert-to-efi-sig-list [-g <guid>] <crt file> <efi sig list file>\n", progname);
+	printf("Usage: cert-to-efi-sig-list [-g <guid>] <crt file> <efi sig list file>\n");
 }
 
 static void help()
@@ -32,7 +32,6 @@ static void help()
 int main(int argc, char *argv[])
 {
 	char *certfile, *efifile;
-	const char *progname = argv[0];
 	EFI_GUID owner;
 	memset(&owner, 0, sizeof(EFI_GUID));
 
