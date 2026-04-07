@@ -18,7 +18,7 @@
 
 void usage()
 {
-	printf("Usage: sign-efi-siglist [-g <guid>] [-t <timestamp>] [-c <crt_file>] [-k <key_file>] <var> <x.esl> <x.vardata>\n");
+	printf("Usage: sign-efi-siglist [-a] [-g <guid>] [-t <timestamp>] [-c <crt_file>] [-k <key_file>] <var> <x.esl> <x.vardata>\n");
 }
 
 void help()
